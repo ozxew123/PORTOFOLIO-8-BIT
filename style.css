@@ -27,6 +27,7 @@ main{position:relative;min-height:100vh;overflow:hidden}
 .pixel-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border:2px solid var(--primary);background:transparent;color:var(--primary);font:10px var(--pixel);text-transform:uppercase;letter-spacing:1px;transition:.2s;cursor:pointer}
 .pixel-button:hover{background:var(--primary);color:#000;box-shadow:0 0 5px var(--primary),0 0 15px rgba(255,136,0,.5)}
 .mobile-menu{display:none}
+.mobile-menu.is-active{background:var(--primary);color:#000;box-shadow:0 0 8px var(--primary),0 0 22px rgba(255,136,0,.7);border-color:#fff}
 .hero{min-height:100vh;display:flex;align-items:center;padding-top:120px}
 .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
 .hero-title{font-size:clamp(28px,4vw,50px);margin:0 0 24px}
@@ -128,7 +129,25 @@ main{position:relative;min-height:100vh;overflow:hidden}
 ::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:#0a0a0a}::-webkit-scrollbar-thumb{background:var(--primary);border-radius:5px}::-webkit-scrollbar-thumb:hover{background:var(--primary-hover)}
 
 @media(max-width:800px){
-  .nav-links.mobile-open{display:flex;position:absolute;top:70px;right:16px;flex-direction:column;gap:18px;background:#0a0a0a;border:1px solid #292929;padding:20px;box-shadow:0 10px 30px #000}
+  .nav-links.mobile-open{
+    display:flex;
+    position:absolute;
+    top:72px;
+    right:20px;
+    min-width:200px;
+    flex-direction:column;
+    gap:18px;
+    background:#0a0a0a;
+    border:2px solid var(--primary);
+    padding:22px;
+    box-shadow:0 10px 35px rgba(0,0,0,.9), 0 0 15px rgba(255,136,0,.25);
+    border-radius:4px;
+    animation:mobileMenuOpen .2s ease-out;
+  }
+  @keyframes mobileMenuOpen{
+    from{opacity:0;transform:translateY(-8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
 }
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(5px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;padding:20px}

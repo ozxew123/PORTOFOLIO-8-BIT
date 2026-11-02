@@ -68,11 +68,31 @@ document.querySelectorAll(".reveal,.reveal-left,.reveal-right").forEach(el=>obse
 
 document.getElementById("year").textContent=new Date().getFullYear();
 
-document.getElementById("menu-btn").addEventListener("click",()=>{
-  document.querySelector(".nav-links").classList.toggle("mobile-open");
+const menuBtn = document.getElementById("menu-btn");
+const navLinks = document.querySelector(".nav-links");
+
+function toggleMobileMenu(isOpen) {
+  const open = typeof isOpen === "boolean" ? isOpen : !navLinks.classList.contains("mobile-open");
+  navLinks.classList.toggle("mobile-open", open);
+  menuBtn.classList.toggle("is-active", open);
+}
+
+menuBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  toggleMobileMenu();
 });
-document.querySelector(".nav-links").addEventListener("click",e=>{
-  if(e.target.tagName==="A") document.querySelector(".nav-links").classList.remove("mobile-open");
+
+navLinks.addEventListener("click", (e) => {
+  if (e.target.tagName === "A") {
+    toggleMobileMenu(false);
+  }
+});
+
+// Otomatis matikan saklar menu jika klik di luar
+document.addEventListener("click", (e) => {
+  if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
+    toggleMobileMenu(false);
+  }
 });
 
 // Skill Tree Data
