@@ -171,3 +171,358 @@ main{position:relative;min-height:100vh;overflow:hidden}
 .skill-level-text {color: var(--primary); text-shadow: 2px 2px 0px #000;}
 .skill-bar-bg {width: 100%; height: 28px; background: #111; border: 4px solid #333; outline: 2px solid #000; position: relative; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);}
 .skill-bar-fill {height: 100%; background: linear-gradient(90deg, #cc4400, #ff8800); width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: inset 0px 4px 0px rgba(255,255,255,0.25), inset 0px -4px 0px rgba(0,0,0,0.3); border-right: 2px solid #fff;}
+
+/* ==========================================
+   8-BIT MARIO SCROLL COMPANION STYLES
+   ========================================== */
+.mario-companion {
+  position: fixed;
+  bottom: 22px;
+  left: 36px;
+  width: 54px;
+  height: 54px;
+  z-index: 9999;
+  pointer-events: auto;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: transform 0.12s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.mario-companion:active {
+  cursor: grabbing;
+}
+
+/* Character Container & Direction */
+.mario-char-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: center bottom;
+  transition: transform 0.15s ease-out;
+}
+
+/* Direction: Facing Right vs Left */
+.mario-companion[data-dir="left"] .mario-char-container {
+  transform: scaleX(-1);
+}
+.mario-companion[data-dir="right"] .mario-char-container {
+  transform: scaleX(1);
+}
+
+/* Character Active Vector Sprite */
+.mario-spr {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  display: block;
+}
+
+/* Walk Bob (Frame 2 step) */
+.mario-companion[data-state="walk"][data-frame="2"] .mario-char-container {
+  margin-bottom: 2px;
+}
+
+/* SCROLL DOWN -> TERJUN (FALLING POSE) */
+.mario-companion[data-state="fall"] .mario-char-container {
+  transform: translateY(28px) scaleY(1.25) scaleX(0.85) rotate(12deg) !important;
+  animation: marioFallWobble 0.18s ease-in-out infinite alternate;
+}
+.mario-companion[data-state="fall"][data-dir="left"] .mario-char-container {
+  transform: scaleX(-1) translateY(28px) scaleY(1.25) scaleX(0.85) rotate(12deg) !important;
+}
+
+@keyframes marioFallWobble {
+  0% { transform: translateY(26px) scaleY(1.22) scaleX(0.86) rotate(10deg); }
+  100% { transform: translateY(32px) scaleY(1.28) scaleX(0.82) rotate(14deg); }
+}
+
+/* SCROLL UP -> TERKENA TEKANAN (SQUASH / PRESSURE POSE) */
+.mario-companion[data-state="squash"] .mario-char-container {
+  transform: translateY(8px) scaleY(0.56) scaleX(1.44) !important;
+  animation: marioPressureShudder 0.08s linear infinite alternate;
+}
+.mario-companion[data-state="squash"][data-dir="left"] .mario-char-container {
+  transform: scaleX(-1) translateY(8px) scaleY(0.56) scaleX(1.44) !important;
+}
+
+@keyframes marioPressureShudder {
+  0% { transform: translateY(7px) scaleY(0.55) scaleX(1.45); }
+  100% { transform: translateY(9px) scaleY(0.58) scaleX(1.42); }
+}
+
+/* LANDING / RECOVERY BOUNCE */
+.mario-companion[data-state="landing"] .mario-char-container {
+  animation: marioLandingBounce 0.22s ease-out;
+}
+@keyframes marioLandingBounce {
+  0% { transform: scaleY(0.68) scaleX(1.3); }
+  50% { transform: scaleY(1.18) scaleX(0.88); }
+  100% { transform: scale(1); }
+}
+
+/* JUMP POSE (CLICK) */
+.mario-companion[data-state="jump"] .mario-char-container {
+  animation: marioClickJump 0.58s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@keyframes marioClickJump {
+  0% { transform: translateY(0); }
+  45% { transform: translateY(-75px); }
+  55% { transform: translateY(-75px); }
+  100% { transform: translateY(0); }
+}
+
+/* DRAGGING STATE */
+.mario-companion.dragging {
+  transition: none !important;
+}
+.mario-companion.dragging .mario-char-container {
+  transform: scale(1.15) rotate(6deg) !important;
+}
+
+/* Ground Shadow */
+.mario-companion-shadow {
+  position: absolute;
+  bottom: -4px;
+  left: 10%;
+  width: 80%;
+  height: 8px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 75%);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.mario-companion[data-state="fall"] .mario-companion-shadow {
+  transform: scale(0.35);
+  opacity: 0.2;
+}
+.mario-companion[data-state="squash"] .mario-companion-shadow {
+  transform: scale(1.5, 0.7);
+  opacity: 0.9;
+}
+.mario-companion[data-state="jump"] .mario-companion-shadow {
+  transform: scale(0.25);
+  opacity: 0.12;
+}
+
+/* Character Switcher Mini Dock */
+.char-switch-dock {
+  position: absolute;
+  top: -42px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  background: rgba(10, 10, 10, 0.9);
+  border: 2px solid #333;
+  border-radius: 20px;
+  padding: 3px 6px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+  opacity: 0.4;
+  transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  z-index: 15;
+}
+.mario-companion:hover .char-switch-dock,
+.char-switch-dock:hover {
+  opacity: 1;
+  border-color: var(--primary);
+  transform: translateX(-50%) translateY(-2px);
+}
+.char-btn {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+  outline: none;
+  line-height: 1;
+}
+.char-btn:hover {
+  transform: scale(1.3);
+}
+.char-btn.active {
+  background: var(--primary);
+  box-shadow: 0 0 6px var(--primary);
+  transform: scale(1.15);
+}
+
+/* Wind / Speed / Pressure Lines */
+.mario-wind-lines {
+  position: absolute;
+  inset: -14px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.w-line {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 5px var(--primary);
+  border-radius: 2px;
+}
+.mario-companion[data-state="fall"] .mario-wind-lines {
+  opacity: 1;
+}
+.mario-companion[data-state="fall"] .w-1 {
+  width: 2px; height: 18px; top: -16px; left: 12px;
+  animation: rushUp 0.18s linear infinite;
+}
+.mario-companion[data-state="fall"] .w-2 {
+  width: 3px; height: 26px; top: -24px; left: 26px;
+  animation: rushUp 0.14s linear infinite 0.04s;
+}
+.mario-companion[data-state="fall"] .w-3 {
+  width: 2px; height: 16px; top: -14px; left: 40px;
+  animation: rushUp 0.2s linear infinite 0.08s;
+}
+.mario-companion[data-state="fall"] .w-4 {
+  width: 2px; height: 20px; top: -18px; left: 48px;
+  animation: rushUp 0.16s linear infinite 0.12s;
+}
+
+@keyframes rushUp {
+  0% { transform: translateY(25px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-20px); opacity: 0; }
+}
+
+.mario-companion[data-state="squash"] .mario-wind-lines {
+  opacity: 1;
+}
+.mario-companion[data-state="squash"] .w-1 {
+  width: 2px; height: 16px; top: -10px; left: 8px;
+  animation: rushDown 0.16s linear infinite;
+}
+.mario-companion[data-state="squash"] .w-2 {
+  width: 3px; height: 22px; top: -14px; left: 24px;
+  animation: rushDown 0.13s linear infinite 0.03s;
+}
+.mario-companion[data-state="squash"] .w-3 {
+  width: 2px; height: 16px; top: -10px; left: 42px;
+  animation: rushDown 0.18s linear infinite 0.06s;
+}
+.mario-companion[data-state="squash"] .w-4 {
+  width: 2px; height: 18px; top: -12px; left: 50px;
+  animation: rushDown 0.15s linear infinite 0.09s;
+}
+
+@keyframes rushDown {
+  0% { transform: translateY(-20px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(25px); opacity: 0; }
+}
+
+/* Landing Dust */
+.mario-dust-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+.mario-companion[data-state="landing"] .mario-dust-wrap {
+  opacity: 1;
+}
+.dust {
+  position: absolute;
+  bottom: 2px;
+  width: 8px;
+  height: 8px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--primary);
+}
+.dust.d-1 {
+  left: 6px;
+  animation: dustPuffLeft 0.22s ease-out forwards;
+}
+.dust.d-2 {
+  right: 6px;
+  animation: dustPuffRight 0.22s ease-out forwards;
+}
+@keyframes dustPuffLeft {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+  100% { transform: translate(-14px, -6px) scale(1.2); opacity: 0; }
+}
+@keyframes dustPuffRight {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+  100% { transform: translate(14px, -6px) scale(1.2); opacity: 0; }
+}
+
+/* Speech Bubble */
+.mario-speech {
+  position: absolute;
+  top: -72px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  background: #000;
+  border: 2px solid var(--primary);
+  color: #fff;
+  font-size: 8px;
+  padding: 5px 9px;
+  white-space: nowrap;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(255,136,0,0.7);
+  pointer-events: none;
+  opacity: 0;
+  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.3), opacity 0.2s ease;
+  z-index: 20;
+}
+.mario-speech::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: var(--primary) transparent;
+}
+.mario-speech.show {
+  transform: translateX(-50%) scale(1);
+  opacity: 1;
+}
+
+/* Coin Popup on Click */
+.mario-coin-popup {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 21;
+}
+.popup-coin {
+  font-size: 9px;
+  color: #ffd700;
+  text-shadow: 2px 2px 0 #000;
+  white-space: nowrap;
+}
+.mario-coin-popup.pop {
+  animation: coinFloatUp 0.65s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+@keyframes coinFloatUp {
+  0% { transform: translate(-50%, 0) scale(0.6); opacity: 1; }
+  50% { transform: translate(-50%, -45px) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -60px) scale(1); opacity: 0; }
+}
+
+/* Hover glow */
+.mario-companion:hover:not(.dragging) {
+  filter: drop-shadow(0 0 8px rgba(255,136,0,0.6));
+}
+
+@media (max-width: 600px) {
+  .mario-companion {
+    bottom: 14px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
