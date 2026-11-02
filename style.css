@@ -21,6 +21,8 @@ main{position:relative;min-height:100vh;overflow:hidden}
 .nav-links{display:flex;gap:36px}
 .nav-links a{font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:2px;color:#999;transition:.2s}
 .nav-links a:hover{color:var(--primary)}
+.nav-links a.active{color:var(--primary);position:relative}
+.nav-links a.active:after{content:"";position:absolute;bottom:-6px;left:0;width:100%;height:2px;background:var(--primary);box-shadow:0 0 8px var(--primary)}
 
 .pixel-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border:2px solid var(--primary);background:transparent;color:var(--primary);font:10px var(--pixel);text-transform:uppercase;letter-spacing:1px;transition:.2s;cursor:pointer}
 .pixel-button:hover{background:var(--primary);color:#000;box-shadow:0 0 5px var(--primary),0 0 15px rgba(255,136,0,.5)}

@@ -27,8 +27,39 @@ for(let i=0;i<70;i++){
   bg.appendChild(star);
 }
 
-const navbar=document.getElementById("navbar");
-window.addEventListener("scroll",()=>navbar.classList.toggle("scrolled",window.scrollY>50));
+const navbar = document.getElementById("navbar");
+const navItems = document.querySelectorAll(".nav-links a");
+const trackedSections = document.querySelectorAll("section[id]");
+
+function handleScroll() {
+  const scrollPos = window.scrollY || window.pageYOffset;
+  navbar.classList.toggle("scrolled", scrollPos > 50);
+
+  // Jika mencapai bagian paling bawah halaman, sorot link Quest
+  if (window.innerHeight + scrollPos >= document.documentElement.scrollHeight - 60) {
+    navItems.forEach(link => {
+      link.classList.toggle("active", link.getAttribute("href") === "#quest");
+    });
+    return;
+  }
+
+  let currentSection = "";
+  trackedSections.forEach(section => {
+    const top = section.offsetTop - 150;
+    const height = section.offsetHeight;
+    if (scrollPos >= top && scrollPos < top + height) {
+      currentSection = section.getAttribute("id");
+    }
+  });
+
+  navItems.forEach(link => {
+    const href = link.getAttribute("href");
+    link.classList.toggle("active", href === `#${currentSection}`);
+  });
+}
+
+window.addEventListener("scroll", handleScroll);
+window.addEventListener("load", handleScroll);
 
 const observer=new IntersectionObserver(entries=>{
   entries.forEach(entry=>{if(entry.isIntersecting) entry.target.classList.add("visible")});
@@ -60,8 +91,8 @@ const skillsData = [
     category: "BACKEND",
     desc: "Server & Logic",
     skills: [
-      { name: "PYTHON", level: 70 },
-      { name: "NODE.JS", level: 65 },
+      { name: "PYTHON", level: 1 },
+      { name: "NODE.JS", level: 21 },
       { name: "GOLANG", level: 50 }
     ]
   },
